@@ -84,11 +84,33 @@ func (h *hand5) Cards() []Card {
 	return h[:]
 }
 
+type hand []Card
+
+func (h hand) SetCard(n int, c Card) { h[n] = c }
+
+func (h hand) Card(n int) Card { return h[n] }
+
+func (h hand) Len() int { return len(h) }
+
+func (h hand) Cards() []Card { return h }
+
 // Product of each Card's Prime
-func (h *hand5) Prime() int {
-	return h.Card(0).Prime() * h.Card(1).Prime() * h.Card(2).Prime() * h.Card(3).Prime() * h.Card(4).Prime()
+func (h hand) Prime() int {
+	product := 1
+
+	for _, c := range h {
+		product *= c.Prime()
+	}
+
+	return product
 }
 
-func (h *hand5) Bit() int {
-	return h.Card(0).Bit() | h.Card(1).Bit() | h.Card(2).Bit() | h.Card(3).Bit() | h.Card(4).Bit()
+func (h hand) Bit() int {
+	var bit int
+
+	for _, c := range h {
+		bit |= c.Bit()
+	}
+
+	return bit
 }
