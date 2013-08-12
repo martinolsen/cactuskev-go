@@ -14,7 +14,14 @@ type Hand interface {
 }
 
 func NewHand(n int) Hand {
-	return new(hand5ints)
+	switch n {
+	case 5:
+		return new(hand5ints)
+	case 7:
+		return new(hand7ints)
+	default:
+		return hand(make([]Card, n))
+	}
 }
 
 type hand5ints struct {
@@ -70,18 +77,74 @@ func (h *hand5ints) Bit() int {
 	return h.one.Bit() | h.two.Bit() | h.three.Bit() | h.four.Bit() | h.five.Bit()
 }
 
-type hand5 [5]Card
+type hand7ints struct{ one, two, three, four, five, six, seven Card }
 
-func (h *hand5) SetCard(n int, c Card) {
-	h[n] = c
+func (h *hand7ints) SetCard(n int, c Card) {
+	switch n {
+	case 0:
+		h.one = c
+	case 1:
+		h.two = c
+	case 2:
+		h.three = c
+	case 3:
+		h.four = c
+	case 4:
+		h.five = c
+	case 5:
+		h.six = c
+	case 6:
+		h.seven = c
+	default:
+		log.Panicf("index overflow: %d", n)
+	}
 }
 
-func (h *hand5) Card(n int) Card {
-	return h[n]
+func (h *hand7ints) Card(n int) Card {
+	switch n {
+	case 0:
+		return h.one
+	case 1:
+		return h.two
+	case 2:
+		return h.three
+	case 3:
+		return h.four
+	case 4:
+		return h.five
+	case 5:
+		return h.six
+	case 6:
+		return h.seven
+	default:
+		log.Panicf("index overflow: %d", n)
+		return 0
+	}
 }
 
-func (h *hand5) Cards() []Card {
-	return h[:]
+func (h *hand7ints) Len() int { return 7 }
+
+func (h *hand7ints) Cards() []Card {
+	return []Card{h.one, h.two, h.three, h.four, h.five, h.six, h.seven}
+}
+
+func (h *hand7ints) Prime() int {
+	return h.one.Prime() *
+		h.two.Prime() *
+		h.three.Prime() *
+		h.four.Prime() *
+		h.five.Prime() *
+		h.six.Prime()
+}
+
+func (h *hand7ints) Bit() int {
+	return h.one.Bit() |
+		h.two.Bit() |
+		h.three.Bit() |
+		h.four.Bit() |
+		h.five.Bit() |
+		h.six.Bit() |
+		h.seven.Bit()
 }
 
 type hand []Card
