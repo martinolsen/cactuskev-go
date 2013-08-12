@@ -16,6 +16,8 @@ func Eval(h Hand) Score {
 	switch h.Len() {
 	case 5:
 		return Score(eval_5hand(h))
+	case 7:
+		return Score(eval_7hand(h))
 	default:
 		log.Panicf("no evaluator for %d Card Hands", len(h.Cards()))
 	}
@@ -151,6 +153,25 @@ func NewDeck() Deck {
 	}
 
 	return deck
+}
+
+func eval_7hand(h Hand) int16 {
+	var (
+		sh   = NewHand(5)
+		best = int16(9999)
+	)
+
+	for i := 0; i < 21; i++ {
+		for j := 0; j < 5; j++ {
+			sh.SetCard(j, h.Card(perm7[i][j]))
+		}
+
+		if q := eval_5hand(sh); q < best {
+			best = q
+		}
+	}
+
+	return best
 }
 
 func eval_5hand(h Hand) int16 {
