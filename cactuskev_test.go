@@ -4,14 +4,24 @@ import (
 	"testing"
 )
 
-func BenchmarkCactusKev(b *testing.B) {
+func BenchmarkFiveHand(b *testing.B) {
+	h := RandomHand(5)
+
 	for i := 0; i < b.N; i++ {
-		AllFive(Eval)
+		Eval(h)
 	}
 }
 
-func TestCactusKev(t *testing.T) {
-	AllFive(Eval)
+func TestAllFive(t *testing.T) {
+	AllFive(t, Eval)
+}
+
+func TestSeven(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping, because.")
+	}
+
+	AllSeven(t, Eval)
 }
 
 func TestCard(t *testing.T) {
@@ -59,7 +69,7 @@ func TestHand(t *testing.T) {
 	tests := []struct {
 		cards [5]Card
 		c     Category
-		s     Score
+		s     CactusKevScore
 	}{ // AKQJ9
 		{
 			[...]Card{NewCard(Heart, Ace), NewCard(Heart, King), NewCard(Heart, Queen), NewCard(Heart, Jack), NewCard(Heart, Nine)},

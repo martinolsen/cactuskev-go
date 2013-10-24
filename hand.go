@@ -1,7 +1,9 @@
 package cactuskev
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
 )
 
 type Hand interface {
@@ -77,6 +79,10 @@ func (h *hand5ints) Bit() int {
 	return h.one.Bit() | h.two.Bit() | h.three.Bit() | h.four.Bit() | h.five.Bit()
 }
 
+func (h *hand5ints) String() string {
+	return fmt.Sprintf("[%v %v %v %v %v]", h.one, h.two, h.three, h.four, h.five)
+}
+
 type hand7ints struct{ one, two, three, four, five, six, seven Card }
 
 func (h *hand7ints) SetCard(n int, c Card) {
@@ -147,6 +153,10 @@ func (h *hand7ints) Bit() int {
 		h.seven.Bit()
 }
 
+func (h *hand7ints) String() string {
+	return fmt.Sprintf("[%v %v %v %v %v %v %v]", h.one, h.two, h.three, h.four, h.five, h.six, h.seven)
+}
+
 type hand []Card
 
 func (h hand) SetCard(n int, c Card) { h[n] = c }
@@ -176,4 +186,21 @@ func (h hand) Bit() int {
 	}
 
 	return bit
+}
+
+func RandomHand(n int) Hand {
+	h := NewHand(n)
+	d := NewDeck()
+
+	for i, j := range rand.Perm(d.Len()) {
+		d.Swap(i, j)
+	}
+
+	for i := 0; i < n; i++ {
+		c := d[i]
+		d = d[1:]
+		h.SetCard(i, c)
+	}
+
+	return h
 }
