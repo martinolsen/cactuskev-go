@@ -5,23 +5,50 @@ import (
 )
 
 func BenchmarkFiveHand(b *testing.B) {
-	h := RandomHand(5)
+	bench(b, RandomHand(5))
+}
 
+func BenchmarkSevenHand(b *testing.B) {
+	bench(b, RandomHand(7))
+}
+
+func bench(b *testing.B, hand Hand) {
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		Eval(h)
+		hand.Eval()
 	}
 }
 
-func TestAllFive(t *testing.T) {
-	AllFive(t, Eval)
+func BenchmarkFiveCardHandPrime(b *testing.B) {
+	h := RandomHand(5)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		h.Prime()
+	}
+}
+
+func TestFive(t *testing.T) {
+	RandomHand(5).Eval()
 }
 
 func TestSeven(t *testing.T) {
+	RandomHand(7).Eval()
+}
+
+func TestAllFive(t *testing.T) {
+	AllFive(t,
+		func() Hand { return NewFiveCardHand() },
+		func(h Hand) Hand { return h } /* no need to zero it */)
+}
+
+func TestAllSeven(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping, because.")
 	}
 
-	AllSeven(t, Eval)
+	AllSeven(t,
+		func() Hand { return NewSevenCardHand() },
+		func(h Hand) Hand { return h } /* no need to zero it */)
 }
 
 func TestCard(t *testing.T) {
@@ -69,7 +96,7 @@ func TestHand(t *testing.T) {
 	tests := []struct {
 		cards [5]Card
 		c     Category
-		s     CactusKevScore
+		s     Score
 	}{ // AKQJ9
 		{
 			[...]Card{NewCard(Heart, Ace), NewCard(Heart, King), NewCard(Heart, Queen), NewCard(Heart, Jack), NewCard(Heart, Nine)},
@@ -86,7 +113,7 @@ func TestHand(t *testing.T) {
 
 		t.Logf("%v", h)
 
-		if s := Eval(h); s != test.s {
+		if s := h.Eval(); s != test.s {
 			t.Errorf("expected Score %d, got %d", test.s, s)
 		} else if c := s.Category(); c != test.c {
 			t.Errorf("expected Category %v, got %v", test.c, c)
